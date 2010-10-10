@@ -1,0 +1,18 @@
+data-structures
+|-- list
+|   |-- double-linked-list
+|   |   |-- Makefile
+|   |   `-- list.c
+|   `-- linked-list
+|       |-- Makefile
+|       `-- linked-list.c
+|-- queue
+|   |-- Makefile
+|   `-- queue.c
+|-- stack
+|   |-- Makefile
+|   `-- stack.c
+`-- tree
+    |-- Makefile
+    `-- tree.c
+
