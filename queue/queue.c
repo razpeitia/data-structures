@@ -2,20 +2,63 @@
 #include <stdlib.h>
 
 typedef struct node{
+    /*
+         pointer to next node
+                  |
+        ********  v
+        * data *---->
+        ********
+        ^            ^
+        |            |
+        |    NODE    |
+        node: Pointer to the next NODE structure
+        data: Integer (in this case)
+    */
     struct node* next;
     int data;
 }NODE;
 
 typedef struct queue{
+    /*
+
+        *********     *********             **********
+        * Node1 *---->* Node2 *---->...---->* Node_N *---->NULL
+        *********     *********             **********
+            ^                                   ^
+            |                                   |
+          front                               back
+        size: N
+    */
     NODE *back;
     NODE *front;
     int size;
 }QUEUE;
 
 QUEUE* create_queue(){
-    QUEUE *q = (QUEUE*) malloc(sizeof(QUEUE));
-    if(q == NULL)
-        return q;
+    /* Create a queue and return a pointer to it */
+
+    /*
+
+        *********************
+        *  NULL        NULL *
+        *   ^           ^   *
+        *   |           |   *
+        * front       back  *
+        *                   *
+        * Size: 0           *
+        *********************
+        EMPTY QUEUE STRUCTURE
+    */
+    QUEUE *q = (QUEUE*) malloc(sizeof(QUEUE)); //allocate memory for the QUEUE
+    if(q == NULL) //If the pointer is null there isn't have enough memory
+        return q; //return NULL
+
+    //If you pointer isn't null then inicialize the QUEUE
+    /*
+        front --> NULL
+        back  --> NULL
+        size  =   0
+    */
     q->back = NULL;
     q->front = NULL;
     q->size = 0;
@@ -23,39 +66,158 @@ QUEUE* create_queue(){
 }
 
 int empty(QUEUE *q){
+
+    /* returns true if the QUEUE q is empty false otherwise */
+
+    //If the queue is invalid or doesn't have items in the front then is empty
     if(q == NULL || q->front == NULL)
         return 1;
     return 0;
 }
 
 void enqueue(QUEUE *q, int data){
-    /*Enqueue in the back*/
-    if(q == NULL)
+    /* Add a NODE at the back of the queue */
+    if(q == NULL) //If the queue is null then stop
         return;
 
-    NODE *pnew = (NODE*) malloc(sizeof(NODE));
-    if(pnew == NULL)
+    NODE *pnew = (NODE*) malloc(sizeof(NODE)); //Allocate a NODE
+    if(pnew == NULL) //If pnew (new pointer) is null then stop
         return;
 
-    pnew->data = data;
+    //Put the data in the node
+    pnew->data = data; 
     pnew->next = NULL;
-    if(q->back == NULL)
-        q->front = pnew;
+    /*
+        **********
+        * NODE_1 *---->NULL
+        **********
+        data: data
+    */
+    if(q->back == NULL)//If the back is null, then is the first node that will be in the queue, so...
+        /*
+        Before:
+        *********************
+        *  NULL        NULL *
+        *   ^           ^   *
+        *   |           |   *
+        * front       back  *
+        *                   *
+        * Size: 0           *
+        *********************
+        
+        After:
+        ************************
+        *                      *
+        *  **********          *
+        *  * NODE_1 *---->NULL *
+        *  **********          *
+        *  ^       ^           *
+        *  |       |           *
+        *  front   back        *
+        *                      *
+        * Size: 1              *
+        ************************
+        
+        */
+        q->front = pnew;//Put it in the front
     else
-        q->back->next = pnew;
-    q->back = pnew;
-    q->size++;
+        /*
+        Before:
+        *****************************************************************
+        *                                                               *
+        *  **********     **********              **********            *
+        *  * NODE_1 *---->* NODE_2 *---->....---->* NODE_N *---->NULL   *
+        *  **********     **********              **********            *
+        *   ^                                          ^                *
+        *   |                                          |                *
+        *  front                                      back              *
+        *                                                               *
+        * Size: N                                                       *
+        *****************************************************************
+
+        After:
+        ********************************************************************************
+        *                                                                              *
+        *  **********     **********              **********     ************          *
+        *  * NODE_1 *---->* NODE_2 *---->....---->* NODE_N *---->* NODE_N+1 *---->NULL *
+        *  **********     **********              **********     ************          *
+        *   ^                                                        ^                 *
+        *   |                                                        |                 *
+        *  front                                                    back               *
+        *                                                                              *
+        * Size: N + 1                                                                  *
+        ********************************************************************************
+        */
+        q->back->next = pnew;//Otherwise put in the back
+    q->back = pnew; //The back is now the new node
+    q->size++; //Increment the god damn size of the queue
 }
 
 void dequeue(QUEUE *q){
-    /*Dequeue in the front*/
-    if(q == NULL || q->front == NULL)
+    /* Dequeue in the front */
+    if(q == NULL || q->front == NULL)//If the queue is empty then stop
         return;
 
-    NODE *p = q->front;
-    q->front = q->front->next;
-    free(p);
-    q->size--;
+    NODE *p = q->front; //Keep the front
+    q->front = q->front->next; //The new front is the next element
+    /*
+        Before:
+        *****************************************************************
+        *                                                               *
+        *  **********     **********              **********            *
+        *  * NODE_1 *---->* NODE_2 *---->....---->* NODE_N *---->NULL   *
+        *  **********     **********              **********            *
+        *   ^                                          ^                *
+        *   |                                          |                *
+        *  front                                      back              *
+        *                                                               *
+        * Size: N                                                       *
+        *****************************************************************
+
+        After:
+        *****************************************************************
+        *                                                               *
+        *  **********     **********              ************          *
+        *  * NODE_2 *---->* NODE_3 *---->....---->*  NODE_N  *---->NULL *
+        *  **********     **********              ************          *
+        *   ^                                           ^               *
+        *   |                                           |               *
+        *  front                                       back             *
+        *                                                               *
+        * Size: N - 1                                                   *
+        *****************************************************************
+    */
+    if(q->front == NULL)
+    /*
+        Before:
+        **************************
+        *                        *
+        *  **********            *
+        *  * NODE_1 *---->NULL   *
+        *  **********            *
+        *   ^      ^             *
+        *   |      |             *
+        *  front  back           *
+        *                        *
+        * Size: 1                *
+        **************************
+
+        After:
+        *********************
+        *                   *
+        *                   *
+        *  NULL     NULL    *
+        *                   *
+        *   ^        ^      *
+        *   |        |      *
+        *  front    back    *
+        *                   *
+        * Size: 0           *
+        *********************
+    */
+        q->back = NULL;
+    free(p); //Free the old front
+    q->size--; //Decrement the god damn size of the queue
 }
 
 void print_queue(QUEUE *q){
